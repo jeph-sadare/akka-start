@@ -2,7 +2,7 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>iot-system</groupId>
+    <groupId>hello-akka-java</groupId>
     <artifactId>app</artifactId>
     <version>1.0</version>
 
