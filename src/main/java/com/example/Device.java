@@ -14,6 +14,7 @@ public class Device extends AbstractBehavior<Device.Command> {
 
     public interface Command {}
 
+//    command
     public static final class ReadTemperature implements Command {
         final long requestId;
         final ActorRef<RespondTemperature> replyTo;
@@ -24,6 +25,7 @@ public class Device extends AbstractBehavior<Device.Command> {
         }
     }
 
+//    response
     public static final class RespondTemperature {
         final long requestId;
         final Optional<Double> value;
@@ -34,6 +36,7 @@ public class Device extends AbstractBehavior<Device.Command> {
         }
     }
 
+//    command
     public static final class RecordTemperature implements Command {
         final long requestId;
         final double value;
@@ -46,6 +49,7 @@ public class Device extends AbstractBehavior<Device.Command> {
         }
     }
 
+//    response
     public static final class TemperatureRecorded {
         final long requestId;
 
@@ -58,6 +62,7 @@ public class Device extends AbstractBehavior<Device.Command> {
     private final String deviceId;
     private Optional<Double> lastTemperatureReading = Optional.empty();
 
+//    private constructor
     private Device(ActorContext<Command> context, String groupId, String deviceId) {
         super(context);
         this.groupId = groupId;
@@ -65,6 +70,7 @@ public class Device extends AbstractBehavior<Device.Command> {
         context.getLog().info(" [>] Device actor {}-{} started", groupId, deviceId);
     }
 
+//    actor object factory
     public static Behavior<Command> create(String groupId, String deviceId) {
         return Behaviors.setup(context -> new Device(context, groupId, deviceId));
     }
@@ -78,6 +84,7 @@ public class Device extends AbstractBehavior<Device.Command> {
                 .build();
     }
 
+//    message handler
     private Behavior<Command> onRecordTemperature(RecordTemperature r) {
         getContext().getLog().info(" [>] Recorded temperature reading {} with {}", r.value, r.requestId);
         lastTemperatureReading = Optional.of(r.value);
