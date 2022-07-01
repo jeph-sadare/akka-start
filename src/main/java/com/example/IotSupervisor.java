@@ -9,6 +9,7 @@ import akka.actor.typed.javadsl.Receive;
 
 public class IotSupervisor extends AbstractBehavior<Void> {
 
+//    main actor system
     private IotSupervisor(ActorContext<Void> context) {
         super(context);
         context.getLog().info(" [>] IoT application started");
