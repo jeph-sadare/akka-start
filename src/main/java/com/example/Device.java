@@ -14,7 +14,26 @@ public class Device extends AbstractBehavior<Device.Command> {
 
     public interface Command {}
 
-//    command
+    public static final class RecordTemperature implements Command {
+        final long requestId;
+        final double value;
+        final ActorRef<TemperatureRecorded> replyTo;
+
+        public RecordTemperature(long requestId, double value, ActorRef<TemperatureRecorded> replyTo) {
+            this.requestId = requestId;
+            this.value = value;
+            this.replyTo = replyTo;
+        }
+    }
+
+    public static final class TemperatureRecorded {
+        final long requestId;
+
+        public TemperatureRecorded(long requestId) {
+            this.requestId = requestId;
+        }
+    }
+
     public static final class ReadTemperature implements Command {
         final long requestId;
         final ActorRef<RespondTemperature> replyTo;
@@ -25,7 +44,6 @@ public class Device extends AbstractBehavior<Device.Command> {
         }
     }
 
-//    response
     public static final class RespondTemperature {
         final long requestId;
         final Optional<Double> value;
@@ -36,33 +54,14 @@ public class Device extends AbstractBehavior<Device.Command> {
         }
     }
 
-//    command
-    public static final class RecordTemperature implements Command {
-        final long requestId;
-        final double value;
-        final ActorRef<TemperatureRecorded> replyTo;
-
-        public RecordTemperature(long requestId, Double value, ActorRef<TemperatureRecorded> replyTo) {
-            this.requestId = requestId;
-            this.value = value;
-            this.replyTo = replyTo;
-        }
-    }
-
-//    response
-    public static final class TemperatureRecorded {
-        final long requestId;
-
-        public TemperatureRecorded(long requestId) {
-            this.requestId = requestId;
-        }
+    static enum Passivate implements Command {
+        INSTANCE
     }
 
     private final String groupId;
     private final String deviceId;
     private Optional<Double> lastTemperatureReading = Optional.empty();
 
-//    private constructor
     private Device(ActorContext<Command> context, String groupId, String deviceId) {
         super(context);
         this.groupId = groupId;
@@ -70,7 +69,6 @@ public class Device extends AbstractBehavior<Device.Command> {
         context.getLog().info(" [>] Device actor {}-{} started", groupId, deviceId);
     }
 
-//    actor object factory
     public static Behavior<Command> create(String groupId, String deviceId) {
         return Behaviors.setup(context -> new Device(context, groupId, deviceId));
     }
@@ -80,11 +78,11 @@ public class Device extends AbstractBehavior<Device.Command> {
         return newReceiveBuilder()
                 .onMessage(RecordTemperature.class, this::onRecordTemperature)
                 .onMessage(ReadTemperature.class, this::onReadTemperature)
+                .onMessage(Passivate.class, m -> Behaviors.stopped())
                 .onSignal(PostStop.class, signal -> onPostStop())
                 .build();
     }
 
-//    message handler
     private Behavior<Command> onRecordTemperature(RecordTemperature r) {
         getContext().getLog().info(" [>] Recorded temperature reading {} with {}", r.value, r.requestId);
         lastTemperatureReading = Optional.of(r.value);
